@@ -208,10 +208,13 @@ public interface Client {
     default boolean supportsFormatLoading() {
         return getOptions().getPlayback();
     }
-
     
     default boolean isEmbedded() {
         return false;
+    }
+
+    default boolean requirePlayerScript() {
+        return true;
     }
 
     /**

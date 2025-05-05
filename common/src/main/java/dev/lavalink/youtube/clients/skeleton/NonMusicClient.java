@@ -106,8 +106,6 @@ public abstract class NonMusicClient implements Client {
                                                      @Nullable PlayabilityStatus status,
                                                      boolean validatePlayabilityStatus) throws CannotBeLoaded, IOException {
         SignatureCipherManager cipherManager = source.getCipherManager();
-        CachedPlayerScript playerScript = cipherManager.getCachedPlayerScript(httpInterface);
-        SignatureCipher signatureCipher = cipherManager.getCipherScript(httpInterface, playerScript.url);
 
         ClientConfig config = getBaseClientConfig(httpInterface);
 
@@ -127,9 +125,14 @@ public abstract class NonMusicClient implements Client {
             config.withRootField("params", params);
         }
 
-        String payload = config.withPlaybackSignatureTimestamp(signatureCipher.scriptTimestamp)
-            .setAttributes(httpInterface)
-            .toJsonString();
+        String payload = config.setAttributes(httpInterface).toJsonString();
+        if (requirePlayerScript()) {
+            CachedPlayerScript playerScript = cipherManager.getCachedPlayerScript(httpInterface);
+            SignatureCipher signatureCipher = cipherManager.getCipherScript(httpInterface, playerScript.url);
+            payload = config.withPlaybackSignatureTimestamp(signatureCipher.scriptTimestamp)
+                    .setAttributes(httpInterface)
+                    .toJsonString();
+        }
 
         HttpPost request = new HttpPost(PLAYER_URL);
         request.setEntity(new StringEntity(payload, "UTF-8"));
@@ -139,7 +142,7 @@ public abstract class NonMusicClient implements Client {
         JsonBrowser videoDetails = json.get("videoDetails");
 
         // we should always check playabilityStatus if videoDetails is null because it could contain important
-        // information as to why, which prevents false reports about this not working as intended etc etc.
+        // information as to why, which prevents false reports about this not working as intended etc.
         if (validatePlayabilityStatus || videoDetails.isNull()) {
             // fix: Make this method throw if a status was supplied (typically when we recurse).
             PlayabilityStatus playabilityStatus = getPlayabilityStatus(playabilityJson, status != null);

@@ -5,6 +5,7 @@ import com.sedmelluq.discord.lavaplayer.tools.ExceptionTools;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpClientTools;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpInterface;
 import dev.lavalink.youtube.YoutubeSource;
+import dev.lavalink.youtube.cipher.ScriptExtractionException.ExtractionFailureType;
 import dev.lavalink.youtube.track.format.StreamFormat;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -206,16 +207,15 @@ public class SignatureCipherManager {
     }
   }
 
-  private SignatureCipher extractFromScript(@NotNull String script, @NotNull String sourceUrl) {
+  private SignatureCipher extractFromScript(@NotNull String script, @NotNull String sourceUrl) throws IllegalStateException {
     Matcher scriptTimestamp = timestampPattern.matcher(script);
 
     if (!scriptTimestamp.find()) {
       dumpProblematicScript(script, sourceUrl, "no timestamp match");
-      throw new IllegalStateException("Must find timestamp from script: " + sourceUrl);
+      throw new ScriptExtractionException("Must find timestamp from script: " + sourceUrl, ExtractionFailureType.TIMESTAMP_NOT_FOUND);
     }
 
-    SignatureCipher cipherKey = new SignatureCipher(scriptTimestamp.group(2) , script);
-    return cipherKey;
+      return new SignatureCipher(scriptTimestamp.group(2) , script);
   }
 
 
