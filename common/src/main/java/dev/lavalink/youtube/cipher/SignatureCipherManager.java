@@ -39,7 +39,7 @@ import static com.sedmelluq.discord.lavaplayer.tools.ExceptionTools.throwWithDeb
 public class SignatureCipherManager {
   private static final Logger log = LoggerFactory.getLogger(SignatureCipherManager.class);
    private static final Pattern timestampPattern = Pattern.compile("(signatureTimestamp|sts):(\\d+)");
-   private static final String repoUrl = "https://raw.githubusercontent.com/munishkhatri720/youtube_player_scripts/refs/heads/main/";
+   private static final String repoUrl = "https://raw.githubusercontent.com/idMJA/youtube_player_scripts/refs/heads/main/";
    private static final Pattern playerIdPattern = Pattern.compile("\\/?player\\/([a-z0-9A-Z_]+)\\/player");
   private final ConcurrentMap<String, SignatureCipher> cipherCache;
   private final Set<String> dumpedScriptUrls;
